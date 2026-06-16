@@ -1,0 +1,37 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char* processStr(char* s) {
+    int maxSize = 1 << 20;  // Large enough for constraints
+    char *result = (char *)malloc(maxSize);
+    int len = 0;
+
+    for (int i = 0; s[i] != '\0'; i++) {
+        char ch = s[i];
+
+        if (ch >= 'a' && ch <= 'z') {
+            result[len++] = ch;
+        }
+        else if (ch == '*') {
+            if (len > 0)
+                len--;
+        }
+        else if (ch == '#') {
+            int currLen = len;
+            for (int j = 0; j < currLen; j++) {
+                result[len++] = result[j];
+            }
+        }
+        else if (ch == '%') {
+            for (int l = 0, r = len - 1; l < r; l++, r--) {
+                char temp = result[l];
+                result[l] = result[r];
+                result[r] = temp;
+            }
+        }
+    }
+
+    result[len] = '\0';
+    return result;
+}
