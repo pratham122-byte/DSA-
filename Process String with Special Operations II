@@ -1,0 +1,84 @@
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+
+char processStr(char* s, long long k) {
+    int n = strlen(s);
+
+    long long *len = (long long *)malloc((n + 1) * sizeof(long long));
+    len[0] = 0;
+
+    // Calculate length after each operation
+    for (int i = 0; i < n; i++) {
+        char c = s[i];
+
+        if (c >= 'a' && c <= 'z') {
+            len[i + 1] = len[i] + 1;
+        }
+        else if (c == '*') {
+            len[i + 1] = (len[i] > 0) ? len[i] - 1 : 0;
+        }
+        else if (c == '#') {
+            len[i + 1] = len[i] * 2;
+        }
+        else if (c == '%') {
+            len[i + 1] = len[i];
+        }
+    }
+
+    // Check if k is out of bounds
+    if (k >= len[n]) {
+        free(len);
+        return '.';
+    }
+
+    // Trace back to find the k-th character
+    for (int i = n - 1; i >= 0; i--) {
+        char c = s[i];
+
+        if (c >= 'a' && c <= 'z') {
+            if (k == len[i]) {
+                free(len);
+                return c;
+            }
+        }
+        else if (c == '*') {
+            // No change needed when reversing deletion
+        }
+        else if (c == '#') {
+            long long half = len[i];
+            if (half > 0) {
+                k %= half;
+            }
+        }
+        else if (c == '%') {
+            if (len[i] > 0) {
+                k = len[i] - 1 - k;
+            }
+        }
+    }
+
+    free(len);
+    return '.';
+}
+
+int main() {
+    char s[1000];
+    long long k;
+
+    printf("Enter operation string: ");
+    scanf("%s", s);
+
+    printf("Enter k (0-based index): ");
+    scanf("%lld", &k);
+
+    char result = processStr(s, k);
+
+    if (result == '.') {
+        printf("Index out of range!\n");
+    } else {
+        printf("Character at index %lld = %c\n", k, result);
+    }
+
+    return 0;
+}
